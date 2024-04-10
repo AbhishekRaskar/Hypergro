@@ -130,11 +130,13 @@ const Home = () => {
         darkMode ? "dark-theme" : "light-theme"
       }`}
     >
-      {loading ? ( // Render loader when loading state is true
-        // <div className="flex justify-center items-center h-screen">
-        <div className="loader text-cyan-600 text-center" style={{fontSize: "30px"}}>Loading.....</div>
-
-        // </div>
+      {loading ? (
+        <div
+          className="loader text-cyan-600 text-center"
+          style={{ fontSize: "30px" }}
+        >
+          Loading.....
+        </div>
       ) : (
         <div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
