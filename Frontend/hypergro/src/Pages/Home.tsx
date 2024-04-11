@@ -40,11 +40,11 @@ const Home = () => {
     const storedTheme = localStorage.getItem("darkMode");
     return storedTheme ? JSON.parse(storedTheme) : false;
   });
-  const [loading, setLoading] = useState<boolean>(false); // Add loading state
+  const [loading, setLoading] = useState<boolean>(false); 
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true); // Set loading state to true while fetching data
+      setLoading(true); 
       try {
         const response = await fetch(
           `https://internship-service.onrender.com/videos?page=${currentPage}`
@@ -62,7 +62,7 @@ const Home = () => {
       } catch (error) {
         console.error("Error fetching video data:", error);
       } finally {
-        setLoading(false); // Set loading state to false after fetching data
+        setLoading(false);
       }
     };
 

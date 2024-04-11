@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { Sun, Moon, Search, Menu } from "react-feather"; // Assuming there's a Menu component available
+import { Sun, Moon, Search, Menu } from "react-feather";
 
 const Navbar = () => {
   const [darkMode, setDarkMode] = useState(false);
@@ -8,7 +8,7 @@ const Navbar = () => {
 
   const toggleTheme = () => {
     setDarkMode(!darkMode);
-    // You can add logic here to toggle your theme (e.g., switching CSS classes)
+    
   };
 
   const toggleMenu = () => {
@@ -19,8 +19,7 @@ const Navbar = () => {
     <nav className={`${darkMode ? "bg-gray-900" : "bg-white"} shadow-lg`}>
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <div className="flex-shrink-0 flex items-center">
+              <div className="flex-shrink-0 flex items-center">
             <Link
               to="/"
               className={`text-${darkMode ? "white" : "black"} text-3xl font-bold`}
@@ -29,14 +28,12 @@ const Navbar = () => {
             </Link>
           </div>
 
-          {/* Burger Icon */}
           <div className="md:hidden flex items-center">
             <button onClick={toggleMenu}>
               <Menu className={`text-${darkMode ? "white" : "black"} w-6 h-6`} />
             </button>
           </div>
 
-          {/* Navigation Links (Desktop) */}
           <div className="hidden md:flex space-x-4">
             <Link
               to="/"
@@ -58,7 +55,7 @@ const Navbar = () => {
             </Link>
           </div>
 
-          {/* Menu (Mobile) */}
+          {/* Mobile */}
           <div className={`${showMenu ? "block" : "hidden"} md:hidden absolute top-16 left-0 w-full bg-${darkMode ? "gray" : "white"}-900`}>
             <div className="flex flex-col space-y-4 p-4">
               <Link
@@ -82,7 +79,6 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* Search Input */}
           <div className="flex-shrink-0 hidden md:flex">
             <input
               type="text"
@@ -94,7 +90,6 @@ const Navbar = () => {
             />
           </div>
 
-          {/* Theme Toggle Button */}
           <div className="flex items-center">
             <button
               onClick={toggleTheme}
