@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Heart, Save } from "react-feather";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 interface Post {
   postId: string;
@@ -40,11 +42,19 @@ const Home = () => {
     const storedTheme = localStorage.getItem("darkMode");
     return storedTheme ? JSON.parse(storedTheme) : false;
   });
-  const [loading, setLoading] = useState<boolean>(false); 
+  const [loading, setLoading] = useState<boolean>(false);
+  const [savedPosts, setSavedPosts] = useState<Post[]>(() => {
+    const savedPostsStr = localStorage.getItem("savedPosts");
+    return savedPostsStr ? JSON.parse(savedPostsStr) : [];
+  });
+  const [likedPosts, setLikedPosts] = useState<Post[]>(() => {
+    const likedPostsStr = localStorage.getItem("likedPosts");
+    return likedPostsStr ? JSON.parse(likedPostsStr) : [];
+  });
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true); 
+      setLoading(true);
       try {
         const response = await fetch(
           `https://internship-service.onrender.com/videos?page=${currentPage}`
@@ -53,8 +63,8 @@ const Home = () => {
         if (data && data.data && data.data.posts) {
           const postsWithDefaults = data.data.posts.map((post: Post) => ({
             ...post,
-            isSaved: false,
-            isLiked: false,
+            isSaved: savedPosts.some((savedPost) => savedPost.postId === post.postId),
+            isLiked: likedPosts.some((likedPost) => likedPost.postId === post.postId),
           }));
           setVideoPosts(postsWithDefaults);
           setTotalPages(data.data.totalPages);
@@ -67,17 +77,19 @@ const Home = () => {
     };
 
     fetchData();
-
-    document.addEventListener("click", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
-    };
-  }, [currentPage]);
+  }, [currentPage, savedPosts, likedPosts]);
 
   useEffect(() => {
     localStorage.setItem("darkMode", JSON.stringify(darkMode));
   }, [darkMode]);
+
+  useEffect(() => {
+    localStorage.setItem("savedPosts", JSON.stringify(savedPosts));
+  }, [savedPosts]);
+
+  useEffect(() => {
+    localStorage.setItem("likedPosts", JSON.stringify(likedPosts));
+  }, [likedPosts]);
 
   const handleVideoToggle = (post: Post) => {
     setCurrentVideo(post);
@@ -89,15 +101,6 @@ const Home = () => {
     setIsModalOpen(false);
   };
 
-  const handleClickOutside = (event: MouseEvent) => {
-    if (
-      event.target instanceof HTMLElement &&
-      !event.target.closest(".relative")
-    ) {
-      setIsModalOpen(false);
-    }
-  };
-
   const handleNextPage = () => {
     setCurrentPage((prevPage) => prevPage + 1);
   };
@@ -106,22 +109,38 @@ const Home = () => {
     setCurrentPage((prevPage) => prevPage - 1);
   };
 
-  const handleSaveVideo = (postId: string) => {
-    const updatedPosts = videoPosts.map((post) =>
-      post.postId === postId ? { ...post, isSaved: !post.isSaved } : post
-    );
-    setVideoPosts(updatedPosts);
-
-    localStorage.setItem("videoPosts", JSON.stringify(updatedPosts));
+  const handleSaveVideo = (
+    post: Post,
+    e: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    e.stopPropagation();
+    if (savedPosts.some((savedPost) => savedPost.postId === post.postId)) {
+      const updatedSavedPosts = savedPosts.filter(
+        (savedPost) => savedPost.postId !== post.postId
+      );
+      setSavedPosts(updatedSavedPosts);
+      toast.success("Video removed from saved list");
+    } else {
+      setSavedPosts([...savedPosts, post]);
+      toast.success("Video saved");
+    }
   };
 
-  const handleLikeVideo = (postId: string) => {
-    const updatedPosts = videoPosts.map((post) =>
-      post.postId === postId ? { ...post, isLiked: !post.isLiked } : post
-    );
-    setVideoPosts(updatedPosts);
-
-    localStorage.setItem("videoPosts", JSON.stringify(updatedPosts));
+  const handleLikeVideo = (
+    post: Post,
+    e: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    e.stopPropagation();
+    if (likedPosts.some((likedPost) => likedPost.postId === post.postId)) {
+      const updatedLikedPosts = likedPosts.filter(
+        (likedPost) => likedPost.postId !== post.postId
+      );
+      setLikedPosts(updatedLikedPosts);
+      toast.success("Video unliked");
+    } else {
+      setLikedPosts([...likedPosts, post]);
+      toast.success("Video liked");
+    }
   };
 
   return (
@@ -130,6 +149,7 @@ const Home = () => {
         darkMode ? "dark-theme" : "light-theme"
       }`}
     >
+      <ToastContainer />
       {loading ? (
         <div
           className="loader text-cyan-600 text-center"
@@ -165,7 +185,7 @@ const Home = () => {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
+                        d="M5 3l14 9-14 9V3z"
                       />
                     </svg>
                   </div>
@@ -188,7 +208,7 @@ const Home = () => {
                     </span>
                     <button
                       className="ml-auto mr-2"
-                      onClick={() => handleSaveVideo(post.postId)}
+                      onClick={(e) => handleSaveVideo(post, e)}
                     >
                       {post.isSaved ? (
                         <Save color="blue" />
@@ -196,7 +216,7 @@ const Home = () => {
                         <Save color="gray" />
                       )}
                     </button>
-                    <button onClick={() => handleLikeVideo(post.postId)}>
+                    <button onClick={(e) => handleLikeVideo(post, e)}>
                       {post.isLiked ? (
                         <Heart color="red" />
                       ) : (
@@ -226,11 +246,17 @@ const Home = () => {
             </button>
           </div>
           {isModalOpen && currentVideo && (
-            <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-75 flex items-center justify-center z-50">
+            <div
+              className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-75 flex items-center justify-center z-50"
+              onClick={handleCloseModal}
+            >
               <div className="relative w-full md:w-1/4">
                 <button
                   className="absolute top-2 right-2 text-white bg-gray-800 rounded-full p-2 hover:bg-gray-700"
-                  onClick={handleCloseModal}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleCloseModal();
+                  }}
                 >
                   <svg
                     className="h-6 w-6"
