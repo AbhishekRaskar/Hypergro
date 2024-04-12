@@ -2,7 +2,7 @@
 
 Welcome to HyperGro, the ultimate destination for personalized video content. With our innovative platform, you're in control of what you watch. Dive into a curated collection of videos tailored to your interests, whether you're in the mood for captivating documentaries, thrilling short films, or the latest viral trends.
 
-**App Deployed Link:** [HyperGro](https://hypergro-kappa.vercel.app/)
+**App Deployed Link:** [HyperGro](https://hypergro-ten.vercel.app/)
 
 # Navbar
 ### Dark Mode
